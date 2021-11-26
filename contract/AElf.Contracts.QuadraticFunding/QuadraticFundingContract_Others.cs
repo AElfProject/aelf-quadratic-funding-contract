@@ -1,5 +1,6 @@
 using AElf.Contracts.MultiToken;
 using AElf.CSharp.Core;
+using AElf.Sdk.CSharp;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.QuadraticFunding
@@ -17,11 +18,13 @@ namespace AElf.Contracts.QuadraticFunding
             return new Empty();
         }
 
-        public override Empty UploadProject(Empty input)
+        public override Int64Value UploadProject(Empty input)
         {
             var currentRound = State.CurrentRound.Value;
-            Assert(Context.CurrentBlockTime < State.EndTimeMap[currentRound], $"Round {currentRound} already ended.");
-            var projectId = PerformCalculateProjectId(Context.Sender);// Strict the sender's address.
+            var endTime = State.EndTimeMap[currentRound];
+            Assert(endTime != null, $"Round {currentRound} not started.");
+            Assert(Context.CurrentBlockTime < endTime, $"Round {currentRound} already ended.");
+            var projectId = PerformCalculateProjectId(Context.Sender); // Strict the sender's address.
             var project = State.ProjectMap[projectId] ?? new Project();
             Assert(project.CreateAt == null, "Project already created.");
             project.Round = currentRound;
@@ -30,7 +33,16 @@ namespace AElf.Contracts.QuadraticFunding
             var currentRoundProjectList = State.ProjectListMap[currentRound] ?? new ProjectList();
             currentRoundProjectList.Value.Add(projectId);
             State.ProjectListMap[currentRound] = currentRoundProjectList;
-            return new Empty();
+            Context.Fire(new ProjectUploaded
+            {
+                Uploader = Context.Sender,
+                ProjectId = projectId,
+                Round = currentRound
+            });
+            return new Int64Value
+            {
+                Value = projectId
+            };
         }
 
         public override Empty Vote(VoteInput input)
@@ -58,10 +70,10 @@ namespace AElf.Contracts.QuadraticFunding
 
             var supportArea = input.Votes.Mul(project.TotalVotes.Sub(voted));
             project.TotalVotes = project.TotalVotes.Add(input.Votes);
-            project.SupportArea = supportArea.Add(project.SupportArea);
+            project.SupportArea = project.SupportArea.Add(supportArea);
             if (!State.BanMap[input.ProjectId])
             {
-                State.TotalSupportAreaMap[currentRound] = supportArea.Add(State.TotalSupportAreaMap[currentRound]);
+                State.TotalSupportAreaMap[currentRound] = State.TotalSupportAreaMap[currentRound].Add(supportArea);
             }
 
             State.TokenContract.TransferFrom.Send(new TransferFromInput
@@ -103,7 +115,8 @@ namespace AElf.Contracts.QuadraticFunding
             var allowance = State.TokenContract.GetAllowance.Call(new GetAllowanceInput
             {
                 Owner = Context.Sender,
-                Symbol = State.VoteSymbol.Value
+                Symbol = State.VoteSymbol.Value,
+                Spender = Context.Self
             }).Allowance;
             Assert(allowance >= cost,
                 $"Insufficient allowance of {State.VoteSymbol.Value}: {allowance}. {cost} is needed.");

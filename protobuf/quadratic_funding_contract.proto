@@ -44,7 +44,7 @@ service QuadraticFundingContract {
     // Others.
     rpc Donate (google.protobuf.Int64Value) returns (google.protobuf.Empty) {
     }
-    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.Empty) {
+    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
     }
     rpc Vote (VoteInput) returns (google.protobuf.Empty) {
     }
@@ -178,4 +178,11 @@ message Voted {
     aelf.Address account = 1;
     int64 project = 2;
     int64 vote = 3;
+}
+
+message ProjectUploaded {
+    option (aelf.is_event) = true;
+    aelf.Address uploader = 1;
+    int64 project_id = 2;
+    int64 round = 3;
 }

@@ -144,7 +144,7 @@ namespace AElf.Contracts.QuadraticFunding
 
         private long PerformCalculateProjectId(Address address)
         {
-            return HashHelper.ComputeFrom(address).ToInt64();
+            return Math.Abs(HashHelper.ComputeFrom(address).ToInt64());
         }
     }
 }

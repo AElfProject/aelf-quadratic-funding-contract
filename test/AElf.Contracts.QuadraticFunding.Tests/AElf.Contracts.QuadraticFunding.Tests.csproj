@@ -40,6 +40,9 @@
     <ContractStub Include="..\..\protobuf\quadratic_funding_contract.proto">
       <Link>Protobuf\Proto\quadratic_funding_contract.proto</Link>
     </ContractStub>
+    <ContractStub Include="..\..\protobuf\token_contract.proto">
+      <Link>Protobuf\Proto\token_contract.proto</Link>
+    </ContractStub>
   </ItemGroup>
 
   <ItemGroup>
