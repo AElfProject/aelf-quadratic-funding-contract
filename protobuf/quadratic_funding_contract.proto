@@ -44,7 +44,7 @@ service QuadraticFundingContract {
     // Others.
     rpc Donate (google.protobuf.Int64Value) returns (google.protobuf.Empty) {
     }
-    rpc UploadProject (google.protobuf.Int64Value) returns (google.protobuf.Empty) {
+    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.Empty) {
     }
     rpc Vote (VoteInput) returns (google.protobuf.Empty) {
     }
@@ -72,12 +72,16 @@ service QuadraticFundingContract {
     rpc GetProjectOf (google.protobuf.Int64Value) returns (Project) {
         option (aelf.is_view) = true;
     }
+    rpc CalculateProjectId (aelf.Address) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
 }
 
 message InitializeInput {
     aelf.Address owner = 1;
     string vote_symbol = 2;
     int64 basic_voting_unit = 3;
+    int64 interval = 4;
 }
 
 message BanProjectInput {

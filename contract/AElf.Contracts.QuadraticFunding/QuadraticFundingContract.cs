@@ -9,10 +9,10 @@ namespace AElf.Contracts.QuadraticFunding
         {
             Assert(State.Owner.Value == null, "Already initialized.");
             State.TaxPoint.Value = 100;
-            State.VoteSymbol.Value = input.VoteSymbol;
+            State.VoteSymbol.Value = input.VoteSymbol ?? Context.Variables.NativeSymbol;
             State.CurrentRound.Value = 1;
-            State.Interval.Value = 60 * 24 * 3600; // 60 days.
-            State.Owner.Value = input.Owner;
+            State.Interval.Value = input.Interval == 0 ? DefaultInterval : input.Interval; // 60 days.
+            State.Owner.Value = input.Owner ?? Context.Sender;
             State.BasicVotingUnit.Value = input.BasicVotingUnit == 0 ? DefaultBasicVotingUnit : input.BasicVotingUnit;
 
             State.TokenContract.Value =

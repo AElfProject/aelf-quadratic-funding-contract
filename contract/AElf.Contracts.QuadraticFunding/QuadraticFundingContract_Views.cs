@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using AElf.CSharp.Core;
+using AElf.Types;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.QuadraticFunding
@@ -26,7 +28,8 @@ namespace AElf.Contracts.QuadraticFunding
                 var project = State.ProjectMap[projectId];
                 if (project == null) continue;
                 rankingList.Votes.Add(project.TotalVotes);
-                rankingList.Support.Add(project.SupportArea);
+                var support = State.BanMap[projectId] ? 0 : project.SupportArea;
+                rankingList.Support.Add(support);
                 rankingList.Grants.Add(project.Grants);
             }
 
@@ -44,22 +47,6 @@ namespace AElf.Contracts.QuadraticFunding
             }
 
             var fullProjects = State.ProjectListMap[round];
-
-            /*
-if (end > projects.length) {
-			end = projects.length;
-		}
-		for (uint256 i = start; i < end; i++) {
-			if (i >= fullProjects.length) {
-				break;
-			}
-			uint256 pid = fullProjects[i];
-			projects[i] = pid;
-			votes[i] = _projects[pid].totalVotes;
-			support[i] = ban[pid] ? 0 : _projects[pid].supportArea;
-			grants[i] = _projects[pid].grants;
-		}
-             */
 
             var start = input.Page.Mul(input.Size);
             var end = start.Add(input.Size);
@@ -144,6 +131,20 @@ if (end > projects.length) {
         public override Project GetProjectOf(Int64Value input)
         {
             return State.ProjectMap[input.Value];
+        }
+
+        public override Int64Value CalculateProjectId(Address input)
+        {
+            var address = input.Value.Any() ? input : Context.Sender;
+            return new Int64Value
+            {
+                Value = PerformCalculateProjectId(address)
+            };
+        }
+
+        private long PerformCalculateProjectId(Address address)
+        {
+            return HashHelper.ComputeFrom(address).ToInt64();
         }
     }
 }

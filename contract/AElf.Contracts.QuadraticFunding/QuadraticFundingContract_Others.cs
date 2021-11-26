@@ -17,12 +17,11 @@ namespace AElf.Contracts.QuadraticFunding
             return new Empty();
         }
 
-        public override Empty UploadProject(Int64Value input)
+        public override Empty UploadProject(Empty input)
         {
             var currentRound = State.CurrentRound.Value;
             Assert(Context.CurrentBlockTime < State.EndTimeMap[currentRound], $"Round {currentRound} already ended.");
-            var projectId = HashHelper.ComputeFrom(Context.Sender).ToInt64();
-            Assert(projectId == input.Value, "No permission.");
+            var projectId = PerformCalculateProjectId(Context.Sender);// Strict the sender's address.
             var project = State.ProjectMap[projectId] ?? new Project();
             Assert(project.CreateAt == null, "Project already created.");
             project.Round = currentRound;
@@ -60,7 +59,10 @@ namespace AElf.Contracts.QuadraticFunding
             var supportArea = input.Votes.Mul(project.TotalVotes.Sub(voted));
             project.TotalVotes = project.TotalVotes.Add(input.Votes);
             project.SupportArea = supportArea.Add(project.SupportArea);
-            State.TotalSupportAreaMap[currentRound] = supportArea.Add(State.TotalSupportAreaMap[currentRound]);
+            if (!State.BanMap[input.ProjectId])
+            {
+                State.TotalSupportAreaMap[currentRound] = supportArea.Add(State.TotalSupportAreaMap[currentRound]);
+            }
 
             State.TokenContract.TransferFrom.Send(new TransferFromInput
             {
