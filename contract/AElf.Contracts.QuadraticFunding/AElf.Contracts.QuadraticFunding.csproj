@@ -2,12 +2,12 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <PackageId>AElf.Contracts.QuadraticFunding</PackageId>
+        <IsContract>true</IsContract>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     </PropertyGroup>
@@ -45,7 +45,6 @@
     <ItemGroup>
         <ContractCode Include="..\..\protobuf\quadratic_funding_contract.proto">
             <Link>Protobuf\Proto\quadratic_funding_contract.proto</Link>
-            <SystemContract>true</SystemContract>
         </ContractCode>
     </ItemGroup>
 </Project>
