@@ -7,6 +7,7 @@ namespace AElf.Contracts.QuadraticFunding
     public partial class QuadraticFundingContractState : ContractState
     {
         public SingletonState<Address> Owner { get; set; }
+        public SingletonState<Address> FeeSetter { get; set; }
 
         public StringState VoteSymbol { get; set; }
 

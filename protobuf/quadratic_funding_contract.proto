@@ -90,7 +90,6 @@ service QuadraticFundingContract {
     rpc CalculateProjectId (aelf.Address) returns (google.protobuf.Int64Value) {
         option (aelf.is_view) = true;
     }
-    
 }
 
 message InitializeInput {

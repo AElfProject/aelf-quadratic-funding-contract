@@ -15,6 +15,7 @@ namespace AElf.Contracts.QuadraticFunding
             State.CurrentRound.Value = 1;
             State.Interval.Value = input.Interval == 0 ? DefaultInterval : input.Interval; // 60 days.
             State.Owner.Value = input.Owner ?? Context.Sender;
+            State.FeeSetter.Value = input.Owner ?? Context.Sender;
             State.BasicVotingUnit.Value = input.BasicVotingUnit == 0 ? DefaultBasicVotingUnit : input.BasicVotingUnit;
 
             State.TokenContract.Value =
