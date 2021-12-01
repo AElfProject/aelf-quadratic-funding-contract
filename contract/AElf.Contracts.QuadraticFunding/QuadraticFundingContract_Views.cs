@@ -142,6 +142,31 @@ namespace AElf.Contracts.QuadraticFunding
             };
         }
 
+        public override Int64Value GetCurrentRound(Empty input)
+        {
+            return new Int64Value {Value = State.CurrentRound.Value};
+        }
+
+        public override Int64Value GetTaxPoint(Empty input)
+        {
+            return new Int64Value {Value = State.TaxPoint.Value};
+        }
+
+        public override Int64Value GetTax(Empty input)
+        {
+            return new Int64Value {Value = State.Tax.Value};
+        }
+
+        public override Int64Value GetInterval(Empty input)
+        {
+            return new Int64Value {Value = State.Interval.Value};
+        }
+
+        public override Int64Value GetVotingUnit(Empty input)
+        {
+            return new Int64Value {Value = State.BasicVotingUnit.Value};
+        }
+
         private long PerformCalculateProjectId(Address address)
         {
             return Math.Abs(HashHelper.ComputeFrom(address).ToInt64());

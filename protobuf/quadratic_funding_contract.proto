@@ -72,9 +72,25 @@ service QuadraticFundingContract {
     rpc GetProjectOf (google.protobuf.Int64Value) returns (Project) {
         option (aelf.is_view) = true;
     }
+    rpc GetCurrentRound (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
+    rpc GetTaxPoint (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
+    rpc GetTax (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
+    rpc GetInterval (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
+    rpc GetVotingUnit (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+        option (aelf.is_view) = true;
+    }
     rpc CalculateProjectId (aelf.Address) returns (google.protobuf.Int64Value) {
         option (aelf.is_view) = true;
     }
+    
 }
 
 message InitializeInput {
