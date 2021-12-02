@@ -1,5 +1,4 @@
-﻿using System;
-using AElf.Contracts.MultiToken;
+﻿using AElf.Contracts.MultiToken;
 using AElf.CSharp.Core;
 using AElf.CSharp.Core.Extension;
 using AElf.Sdk.CSharp;
@@ -14,8 +13,13 @@ namespace AElf.Contracts.QuadraticFunding
         {
             AssertSenderIsOwner();
             var currentRound = State.CurrentRound.Value;
-            Assert(Context.CurrentBlockTime > State.EndTimeMap[currentRound] &&
-                   State.EndTimeMap[currentRound].Seconds > 0);
+            var endTime = State.EndTimeMap[currentRound];
+            if (endTime == null)
+            {
+                throw new AssertionException($"Round {Context.CurrentBlockTime} not started.");
+            }
+
+            Assert(Context.CurrentBlockTime > endTime && endTime.Seconds > 0, "Too early.");
             State.CurrentRound.Value = currentRound.Add(1);
             return new Empty();
         }
