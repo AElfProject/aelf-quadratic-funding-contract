@@ -109,6 +109,12 @@ namespace AElf.Contracts.QuadraticFunding
 
             await VoteAsync(anotherStub, projectId, 1, votingUnit * 4, CalculateGrants(7_00000000), 3);
             await VoteAsync(anotherStub, projectId, 1, votingUnit * 4, CalculateGrants(9_00000000), 6);
+
+            var rankingList = await stub.GetRankingList.CallAsync(new Int64Value {Value = 1});
+            rankingList.Projects.Count.ShouldBe(1);
+
+            var project = await stub.GetProjectOf.CallAsync(new Int64Value {Value = projectId});
+            var grants = await stub.GetGrandsOf.CallAsync(new Int64Value {Value = projectId});
         }
 
         private async Task VoteAsync(QuadraticFundingContractContainer.QuadraticFundingContractStub stub,

@@ -118,8 +118,7 @@ namespace AElf.Contracts.QuadraticFunding
                 }
             }
 
-            //Assert(grands.Total > project.Withdrew, "");
-            if (grands.Total > project.Withdrew)
+            if (grands.Total <= project.Withdrew)
             {
                 return new Grands();
             }
