@@ -48,7 +48,7 @@ namespace AElf.Contracts.QuadraticFunding
         public override Empty Vote(VoteInput input)
         {
             var currentRound = State.CurrentRound.Value;
-            Assert(Context.CurrentBlockTime < State.EndTimeMap[currentRound]);
+            Assert(Context.CurrentBlockTime < State.EndTimeMap[currentRound], $"Round {currentRound} already finished.");
             var project = State.ProjectMap[input.ProjectId];
             Assert(project.Round == currentRound,
                 $"Project with id {input.ProjectId} isn't in current round {currentRound}");
@@ -93,7 +93,7 @@ namespace AElf.Contracts.QuadraticFunding
             Assert(projectId == input.ProjectId, "No permission.");
             var project = State.ProjectMap[projectId];
             var grants = GetGrandsOf(new Int64Value {Value = projectId});
-            Assert(grants.Rest >= input.Amount, "");
+            Assert(grants.Rest >= input.Amount, "Insufficient grants.");
             project.Withdrew = project.Withdrew.Add(input.Amount);
             State.TokenContract.Transfer.Send(new TransferInput
             {
