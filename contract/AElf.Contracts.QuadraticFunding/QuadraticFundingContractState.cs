@@ -32,7 +32,7 @@ namespace AElf.Contracts.QuadraticFunding
         /// <summary>
         /// Project Id -> Project
         /// </summary>
-        public MappedState<long, Project> ProjectMap { get; set; }
+        public MappedState<string, Project> ProjectMap { get; set; }
 
         /// <summary>
         /// Round Id -> Project List
@@ -45,11 +45,11 @@ namespace AElf.Contracts.QuadraticFunding
 
         public MappedState<long, long> TotalSupportAreaMap { get; set; }
 
-        public MappedState<long, bool> BanMap { get; set; }
+        public MappedState<string, bool> BanMap { get; set; }
 
         /// <summary>
         /// Project Id -> Voter -> Voted Amount
         /// </summary>
-        public MappedState<long, Address, long> VotedMap { get; set; }
+        public MappedState<string, Address, long> VotedMap { get; set; }
     }
 }

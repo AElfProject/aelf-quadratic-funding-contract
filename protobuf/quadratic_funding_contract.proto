@@ -44,7 +44,7 @@ service QuadraticFundingContract {
     // Others.
     rpc Donate (google.protobuf.Int64Value) returns (google.protobuf.Empty) {
     }
-    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
+    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.StringValue) {
     }
     rpc Vote (VoteInput) returns (google.protobuf.Empty) {
     }
@@ -66,10 +66,10 @@ service QuadraticFundingContract {
     rpc GetVotingCost (GetVotingCostInput) returns (VotingCost) {
         option (aelf.is_view) = true;
     }
-    rpc GetGrandsOf (google.protobuf.Int64Value) returns (Grands) {
+    rpc GetGrandsOf (google.protobuf.StringValue) returns (Grands) {
         option (aelf.is_view) = true;
     }
-    rpc GetProjectOf (google.protobuf.Int64Value) returns (Project) {
+    rpc GetProjectOf (google.protobuf.StringValue) returns (Project) {
         option (aelf.is_view) = true;
     }
     rpc GetCurrentRound (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
@@ -87,7 +87,7 @@ service QuadraticFundingContract {
     rpc GetVotingUnit (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
         option (aelf.is_view) = true;
     }
-    rpc CalculateProjectId (aelf.Address) returns (google.protobuf.Int64Value) {
+    rpc CalculateProjectId (aelf.Address) returns (google.protobuf.StringValue) {
         option (aelf.is_view) = true;
     }
 }
@@ -100,17 +100,17 @@ message InitializeInput {
 }
 
 message BanProjectInput {
-    int64 project_id = 1;
+    string project_id = 1;
     bool ban = 2;
 }
 
 message VoteInput {
-    int64 project_id = 1;
+    string project_id = 1;
     int64 votes = 2;
 }
 
 message TakeOutGrantsInput {
-    int64 project_id = 1;
+    string project_id = 1;
     int64 amount = 2;
 }
 
@@ -125,7 +125,7 @@ message Project {
 }
 
 message ProjectList {
-    repeated int64 value = 1;
+    repeated string value = 1;
 }
 
 message GetPagedRankingListInput {
@@ -136,7 +136,7 @@ message GetPagedRankingListInput {
 
 message RankingList {
     int64 unit = 1;
-    repeated int64 projects = 2;
+    repeated string projects = 2;
     repeated int64 votes = 3;
     repeated int64 support = 4;
     repeated int64 grants = 5;
@@ -151,7 +151,7 @@ message RoundInfo {
 
 message GetVotingCostInput {
     aelf.Address from = 1;
-    int64 project_id = 2;
+    string project_id = 2;
     int64 votes = 3;
 }
 
@@ -169,7 +169,7 @@ message Grands {
 
 message ProjectBanned {
     option (aelf.is_event) = true;
-    int64 project = 1;
+    string project = 1;
     bool ban = 2;
 }
 
@@ -191,13 +191,13 @@ message VotingUnitChanged {
 message Voted {
     option (aelf.is_event) = true;
     aelf.Address account = 1;
-    int64 project = 2;
+    string project = 2;
     int64 vote = 3;
 }
 
 message ProjectUploaded {
     option (aelf.is_event) = true;
     aelf.Address uploader = 1;
-    int64 project_id = 2;
+    string project_id = 2;
     int64 round = 3;
 }

@@ -97,7 +97,7 @@ namespace AElf.Contracts.QuadraticFunding
             return votingCost;
         }
 
-        public override Grands GetGrandsOf(Int64Value input)
+        public override Grands GetGrandsOf(StringValue input)
         {
             var grands = new Grands();
             var project = State.ProjectMap[input.Value];
@@ -127,15 +127,15 @@ namespace AElf.Contracts.QuadraticFunding
             return grands;
         }
 
-        public override Project GetProjectOf(Int64Value input)
+        public override Project GetProjectOf(StringValue input)
         {
             return State.ProjectMap[input.Value];
         }
 
-        public override Int64Value CalculateProjectId(Address input)
+        public override StringValue CalculateProjectId(Address input)
         {
             var address = input.Value.Any() ? input : Context.Sender;
-            return new Int64Value
+            return new StringValue
             {
                 Value = PerformCalculateProjectId(address)
             };
@@ -166,9 +166,9 @@ namespace AElf.Contracts.QuadraticFunding
             return new Int64Value {Value = State.BasicVotingUnit.Value};
         }
 
-        private long PerformCalculateProjectId(Address address)
+        private string PerformCalculateProjectId(Address address)
         {
-            return Math.Abs(HashHelper.ComputeFrom(address).ToInt64());
+            return Math.Abs(HashHelper.ComputeFrom(address).ToInt64()).ToString();
         }
     }
 }

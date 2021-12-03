@@ -18,7 +18,7 @@ namespace AElf.Contracts.QuadraticFunding
             return new Empty();
         }
 
-        public override Int64Value UploadProject(Empty input)
+        public override StringValue UploadProject(Empty input)
         {
             var currentRound = State.CurrentRound.Value;
             var endTime = State.EndTimeMap[currentRound];
@@ -39,7 +39,7 @@ namespace AElf.Contracts.QuadraticFunding
                 ProjectId = projectId,
                 Round = currentRound
             });
-            return new Int64Value
+            return new StringValue
             {
                 Value = projectId
             };
@@ -89,10 +89,10 @@ namespace AElf.Contracts.QuadraticFunding
 
         public override Empty TakeOutGrants(TakeOutGrantsInput input)
         {
-            var projectId = HashHelper.ComputeFrom(Context.Sender).ToInt64();
+            var projectId = PerformCalculateProjectId(Context.Sender);
             Assert(projectId == input.ProjectId, "No permission.");
             var project = State.ProjectMap[projectId];
-            var grants = GetGrandsOf(new Int64Value {Value = projectId});
+            var grants = GetGrandsOf(new StringValue {Value = projectId});
             Assert(grants.Rest >= input.Amount, "Insufficient grants.");
             project.Withdrew = project.Withdrew.Add(input.Amount);
             State.TokenContract.Transfer.Send(new TransferInput
