@@ -39,12 +39,14 @@ namespace AElf.Contracts.QuadraticFunding
             Assert(project.Round == currentRound, "Incorrect round.");
             if (input.Ban)
             {
+                Assert(State.BanMap[input.ProjectId] == false, $"Already banned project {input.ProjectId}.");
                 State.BanMap[input.ProjectId] = true;
                 State.TotalSupportAreaMap[currentRound] =
                     State.TotalSupportAreaMap[currentRound].Sub(project.SupportArea);
             }
             else
             {
+                Assert(State.BanMap[input.ProjectId], $"Project {input.ProjectId} is not banned.");
                 State.BanMap.Remove(input.ProjectId);
                 State.TotalSupportAreaMap[currentRound] =
                     State.TotalSupportAreaMap[currentRound].Add(project.SupportArea);
