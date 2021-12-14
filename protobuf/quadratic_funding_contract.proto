@@ -40,11 +40,12 @@ service QuadraticFundingContract {
     }
     rpc Withdraw (google.protobuf.Empty) returns (google.protobuf.Empty) {
     }
+    // Add DangerSetTime & DangerSetEndTime
 
     // Others.
     rpc Donate (google.protobuf.Int64Value) returns (google.protobuf.Empty) {
     }
-    rpc UploadProject (google.protobuf.Empty) returns (google.protobuf.StringValue) {
+    rpc UploadProject (google.protobuf.Int64Value) returns (google.protobuf.StringValue) {
     }
     rpc Vote (VoteInput) returns (google.protobuf.Empty) {
     }
@@ -87,7 +88,7 @@ service QuadraticFundingContract {
     rpc GetVotingUnit (google.protobuf.Empty) returns (google.protobuf.Int64Value) {
         option (aelf.is_view) = true;
     }
-    rpc CalculateProjectId (aelf.Address) returns (google.protobuf.StringValue) {
+    rpc CalculateProjectId (CalculateProjectIdInput) returns (google.protobuf.StringValue) {
         option (aelf.is_view) = true;
     }
 }
@@ -163,6 +164,11 @@ message VotingCost {
 message Grands {
     int64 rest = 1;
     int64 total = 2;
+}
+
+message CalculateProjectIdInput {
+    aelf.Address address = 1;
+    int32 bid = 2;
 }
 
 // Events

@@ -52,20 +52,34 @@ namespace AElf.Contracts.QuadraticFunding
         }
 
         [Fact]
-        public async Task<long> UploadProjectTest()
+        public async Task<string> UploadProjectTest()
         {
+            const int bid = 1111;
             var stub = await Initialize();
             await stub.RoundStart.SendAsync(new Empty());
-            await stub.UploadProject.SendAsync(new Empty());
-            var projectId = (await stub.CalculateProjectId.CallAsync(new Address())).Value;
+            var calculatedProjectId = (await stub.CalculateProjectId.CallAsync(new CalculateProjectIdInput
+            {
+                Bid = bid
+            })).Value;
+            calculatedProjectId.Length.ShouldBe(14);
+            calculatedProjectId.ShouldStartWith("1111");
+            await stub.UploadProject.SendAsync(new Int64Value {Value = long.Parse(calculatedProjectId)});
 
             var allProjects = await stub.GetAllProjects.CallAsync(new Int64Value
             {
                 Value = 1
             });
-            allProjects.Value.ShouldContain(projectId);
+            allProjects.Value.ShouldContain(calculatedProjectId);
+            
+            // Another account cannot use the same project id.
+            var anotherKeyPair = SampleAccount.Accounts.Skip(1).First().KeyPair;
+            var anotherStub = GetQuadraticFundingContractStub(anotherKeyPair);
+            var executionResult =
+                await anotherStub.UploadProject.SendWithExceptionAsync(new Int64Value
+                    {Value = long.Parse(calculatedProjectId)});
+            executionResult.TransactionResult.Error.ShouldContain("not match");
 
-            return projectId;
+            return calculatedProjectId;
         }
 
         [Fact]
@@ -88,8 +102,8 @@ namespace AElf.Contracts.QuadraticFunding
 
             const long votingUnit = 1_00000000;
             await VoteAsync(stub, projectId, 1, votingUnit * 1, CalculateGrants(1_00000000), 0);
-            await VoteAsync(stub, projectId, 1, votingUnit * 2,  CalculateGrants(3_00000000), 0);
-            await VoteAsync(stub, projectId, 1, votingUnit * 3,  CalculateGrants(6_00000000), 0);
+            await VoteAsync(stub, projectId, 1, votingUnit * 2, CalculateGrants(3_00000000), 0);
+            await VoteAsync(stub, projectId, 1, votingUnit * 3, CalculateGrants(6_00000000), 0);
 
             var anotherKeyPair = SampleAccount.Accounts.Skip(1).First().KeyPair;
             var anotherStub = GetQuadraticFundingContractStub(anotherKeyPair);
@@ -113,12 +127,12 @@ namespace AElf.Contracts.QuadraticFunding
             var rankingList = await stub.GetRankingList.CallAsync(new Int64Value {Value = 1});
             rankingList.Projects.Count.ShouldBe(1);
 
-            var project = await stub.GetProjectOf.CallAsync(new Int64Value {Value = projectId});
-            var grants = await stub.GetGrandsOf.CallAsync(new Int64Value {Value = projectId});
+            var project = await stub.GetProjectOf.CallAsync(new StringValue {Value = projectId});
+            var grants = await stub.GetGrandsOf.CallAsync(new StringValue {Value = projectId});
         }
 
         private async Task VoteAsync(QuadraticFundingContractContainer.QuadraticFundingContractStub stub,
-            long projectId, long votes, long expectedCost, long expectedGrants, long expectedSupportArea)
+            string projectId, long votes, long expectedCost, long expectedGrants, long expectedSupportArea)
         {
             var votingCost = (await stub.GetVotingCost.CallAsync(new GetVotingCostInput
             {
@@ -136,7 +150,7 @@ namespace AElf.Contracts.QuadraticFunding
             });
 
             // Check project.
-            var project = await stub.GetProjectOf.CallAsync(new Int64Value
+            var project = await stub.GetProjectOf.CallAsync(new StringValue
             {
                 Value = projectId
             });

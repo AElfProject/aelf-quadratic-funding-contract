@@ -18,13 +18,15 @@ namespace AElf.Contracts.QuadraticFunding
             return new Empty();
         }
 
-        public override StringValue UploadProject(Empty input)
+        public override StringValue UploadProject(Int64Value input)
         {
             var currentRound = State.CurrentRound.Value;
             var endTime = State.EndTimeMap[currentRound];
             Assert(endTime != null, $"Round {currentRound} not started.");
             Assert(Context.CurrentBlockTime < endTime, $"Round {currentRound} already ended.");
-            var projectId = PerformCalculateProjectId(Context.Sender); // Strict the sender's address.
+            var senderFeatureValue = CalculateSenderFeatureValue(Context.Sender); // Strict the sender's address.
+            var projectId = input.Value.ToString();
+            Assert(CalculateSenderFeatureValue(projectId) == senderFeatureValue, "Sender not match project id.");
             var project = State.ProjectMap[projectId] ?? new Project();
             Assert(project.CreateAt == null, "Project already created.");
             project.Round = currentRound;
@@ -89,8 +91,9 @@ namespace AElf.Contracts.QuadraticFunding
 
         public override Empty TakeOutGrants(TakeOutGrantsInput input)
         {
-            var projectId = PerformCalculateProjectId(Context.Sender);
-            Assert(projectId == input.ProjectId, "No permission.");
+            var projectId = input.ProjectId;
+            Assert(CalculateSenderFeatureValue(Context.Sender) == CalculateSenderFeatureValue(projectId),
+                "No permission.");
             var project = State.ProjectMap[projectId];
             var grants = GetGrandsOf(new StringValue {Value = projectId});
             Assert(grants.Rest >= input.Amount, "Insufficient grants.");
