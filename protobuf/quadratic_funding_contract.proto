@@ -40,6 +40,8 @@ service QuadraticFundingContract {
     }
     rpc Withdraw (google.protobuf.Empty) returns (google.protobuf.Empty) {
     }
+    rpc DangerSetTime (DangerSetTimeInput) returns (google.protobuf.Empty) {
+    }
     // Add DangerSetTime & DangerSetEndTime
 
     // Others.
@@ -169,6 +171,11 @@ message Grands {
 message CalculateProjectIdInput {
     aelf.Address address = 1;
     int32 bid = 2;
+}
+
+message DangerSetTimeInput {
+    google.protobuf.Timestamp start = 1;
+    google.protobuf.Timestamp end = 2;
 }
 
 // Events
