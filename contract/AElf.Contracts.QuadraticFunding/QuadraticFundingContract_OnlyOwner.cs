@@ -118,6 +118,15 @@ namespace AElf.Contracts.QuadraticFunding
             return new Empty();
         }
 
+        public override Empty DangerSetTime(DangerSetTimeInput input)
+        {
+            AssertSenderIsOwner();
+            var currentRound = State.CurrentRound.Value;
+            State.StartTimeMap[currentRound] = input.Start;
+            State.EndTimeMap[currentRound] = input.End;
+            return new Empty();
+        }
+
         private void AssertSenderIsOwner()
         {
             Assert(State.Owner.Value != null, "Contract not initialized.");

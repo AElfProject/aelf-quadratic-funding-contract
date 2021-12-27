@@ -132,12 +132,12 @@ namespace AElf.Contracts.QuadraticFunding
             return State.ProjectMap[input.Value];
         }
 
-        public override StringValue CalculateProjectId(Address input)
+        public override StringValue CalculateProjectId(CalculateProjectIdInput input)
         {
-            var address = input.Value.Any() ? input : Context.Sender;
+            var address = input.Address ?? Context.Sender;
             return new StringValue
             {
-                Value = PerformCalculateProjectId(address)
+                Value = $"{input.Bid}{CalculateSenderFeatureValue(address).PadLeft(10, '0')}"
             };
         }
 
@@ -166,9 +166,16 @@ namespace AElf.Contracts.QuadraticFunding
             return new Int64Value {Value = State.BasicVotingUnit.Value};
         }
 
-        private string PerformCalculateProjectId(Address address)
+        private string CalculateSenderFeatureValue(Address address)
         {
-            return Math.Abs(HashHelper.ComputeFrom(address).ToInt64()).ToString();
+            // Upper limit 2147483647
+            return Math.Abs(HashHelper.ComputeFrom(address).ToByteArray().ToInt32(true)).ToString();
+        }
+        
+        private string CalculateSenderFeatureValue(string projectId)
+        {
+            var length = projectId.Length;
+            return int.Parse(projectId.Substring(length - 10)).ToString();
         }
     }
 }
