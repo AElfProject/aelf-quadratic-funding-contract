@@ -163,11 +163,18 @@ namespace AElf.Contracts.QuadraticFunding
             return new Int64Value {Value = State.BasicVotingUnit.Value};
         }
 
+        /// <summary>
+        /// Upper limit 2147483647 * 2.
+        /// Must be unique.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         private string CalculateSenderFeatureValue(Address address)
         {
             var hash = HashHelper.ComputeFrom(address);
-            // Upper limit 2147483647
-            return Math.Abs(hash.ToByteArray().ToInt32(true)).ToString();
+            var originInteger = hash.ToByteArray().ToInt32(true);
+            var addMaxValue = (long) originInteger + int.MaxValue;
+            return addMaxValue.ToString();
         }
 
         private string CalculateSenderFeatureValue(string projectId)

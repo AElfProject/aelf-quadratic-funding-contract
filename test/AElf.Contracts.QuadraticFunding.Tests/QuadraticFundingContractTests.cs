@@ -128,7 +128,7 @@ namespace AElf.Contracts.QuadraticFunding
             rankingList.Projects.Count.ShouldBe(1);
 
             var project = await stub.GetProjectOf.CallAsync(new StringValue {Value = projectId});
-            var grants = await stub.GetGrandsOf.CallAsync(new StringValue {Value = projectId});
+            var grants = await stub.GetGrantsOf.CallAsync(new StringValue {Value = projectId});
         }
 
         private async Task VoteAsync(QuadraticFundingContractContainer.QuadraticFundingContractStub stub,
@@ -169,6 +169,24 @@ namespace AElf.Contracts.QuadraticFunding
             var stub = GetQuadraticFundingContractStub(keyPair);
             await stub.Initialize.SendAsync(new InitializeInput());
             return stub;
+        }
+
+        [Fact]
+        public void TestCalculateSenderFeatureValue()
+        {
+            foreach (var account in SampleAccount.Accounts.Take(100))
+            {
+                var featureValue = CalculateSenderFeatureValue(account.Address);
+                featureValue.Length.ShouldBeLessThanOrEqualTo(10);
+            }
+        }
+        
+        private string CalculateSenderFeatureValue(Address address)
+        {
+            var hash = HashHelper.ComputeFrom(address);
+            var originInteger = hash.ToByteArray().ToInt32(true);
+            var addMaxValue = (long) originInteger + int.MaxValue;
+            return addMaxValue.ToString();
         }
     }
 }
