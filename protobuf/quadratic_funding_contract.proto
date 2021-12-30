@@ -69,7 +69,7 @@ service QuadraticFundingContract {
     rpc GetVotingCost (GetVotingCostInput) returns (VotingCost) {
         option (aelf.is_view) = true;
     }
-    rpc GetGrandsOf (google.protobuf.StringValue) returns (Grands) {
+    rpc GetGrantsOf (google.protobuf.StringValue) returns (Grants) {
         option (aelf.is_view) = true;
     }
     rpc GetProjectOf (google.protobuf.StringValue) returns (Project) {
@@ -163,7 +163,7 @@ message VotingCost {
     bool votable = 2;
 }
 
-message Grands {
+message Grants {
     int64 rest = 1;
     int64 total = 2;
 }

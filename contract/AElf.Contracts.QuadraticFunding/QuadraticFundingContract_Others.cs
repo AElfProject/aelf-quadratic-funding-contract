@@ -1,6 +1,7 @@
 using AElf.Contracts.MultiToken;
 using AElf.CSharp.Core;
 using AElf.Sdk.CSharp;
+using AElf.Types;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Contracts.QuadraticFunding
@@ -9,12 +10,20 @@ namespace AElf.Contracts.QuadraticFunding
     {
         public override Empty Donate(Int64Value input)
         {
+            AssertPositive(input.Value);
             var fee = input.Value.Mul(State.TaxPoint.Value).Div(10000);
             var support = input.Value.Sub(fee);
             State.Tax.Value = State.Tax.Value.Add(fee);
             var currentRound = State.CurrentRound.Value;
             State.SupportPoolMap[currentRound] = State.SupportPoolMap[currentRound].Add(support);
             State.PreTaxSupportPoolMap[currentRound] = State.PreTaxSupportPoolMap[currentRound].Add(input.Value);
+            State.TokenContract.TransferFrom.Send(new TransferFromInput
+            {
+                From = Context.Sender,
+                To = Context.Self,
+                Amount = input.Value,
+                Symbol = State.VoteSymbol.Value
+            });
             return new Empty();
         }
 
@@ -95,7 +104,7 @@ namespace AElf.Contracts.QuadraticFunding
             Assert(CalculateSenderFeatureValue(Context.Sender) == CalculateSenderFeatureValue(projectId),
                 "No permission.");
             var project = State.ProjectMap[projectId];
-            var grants = GetGrandsOf(new StringValue {Value = projectId});
+            var grants = GetGrantsOf(new StringValue {Value = projectId});
             Assert(grants.Rest >= input.Amount, "Insufficient grants.");
             project.Withdrew = project.Withdrew.Add(input.Amount);
             State.TokenContract.Transfer.Send(new TransferInput
@@ -123,6 +132,11 @@ namespace AElf.Contracts.QuadraticFunding
             }).Allowance;
             Assert(allowance >= cost,
                 $"Insufficient allowance of {State.VoteSymbol.Value}: {allowance}. {cost} is needed.");
+        }
+
+        private void AssertPositive(long amount)
+        {
+            Assert(amount > 0, "Input value should be positive.");
         }
     }
 }

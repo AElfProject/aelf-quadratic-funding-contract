@@ -97,34 +97,30 @@ namespace AElf.Contracts.QuadraticFunding
             return votingCost;
         }
 
-        public override Grands GetGrandsOf(StringValue input)
+        public override Grants GetGrantsOf(StringValue input)
         {
-            var grands = new Grands();
+            var grants = new Grants();
             var project = State.ProjectMap[input.Value];
             var round = project.Round;
             if (round == 0)
             {
-                return grands;
+                return grants;
             }
 
-            grands.Total = project.Grants;
+            grants.Total = project.Grants;
             if (round < State.CurrentRound.Value)
             {
                 // Round ends.
-                if (State.TotalSupportAreaMap[round] != 0)
+                if (State.TotalSupportAreaMap[round] != 0 && !State.BanMap[input.Value])
                 {
-                    grands.Total = grands.Total.Add(project.SupportArea.Mul(State.SupportPoolMap[round])
+                    grants.Total = grants.Total.Add(project.SupportArea.Mul(State.SupportPoolMap[round])
                         .Div(State.TotalSupportAreaMap[round]));
                 }
             }
 
-            if (grands.Total <= project.Withdrew)
-            {
-                return new Grands();
-            }
-
-            grands.Rest = grands.Total.Sub(project.Withdrew);
-            return grands;
+            grants.Rest = grants.Total.Sub(project.Withdrew);
+            grants.Rest = Math.Max(grants.Rest, 0);
+            return grants;
         }
 
         public override Project GetProjectOf(StringValue input)
@@ -135,9 +131,10 @@ namespace AElf.Contracts.QuadraticFunding
         public override StringValue CalculateProjectId(CalculateProjectIdInput input)
         {
             var address = input.Address ?? Context.Sender;
+            var featureValue = CalculateSenderFeatureValue(address);
             return new StringValue
             {
-                Value = $"{input.Bid}{CalculateSenderFeatureValue(address).PadLeft(10, '0')}"
+                Value = $"{input.Bid}{featureValue.PadLeft(10, '0')}"
             };
         }
 
@@ -166,12 +163,20 @@ namespace AElf.Contracts.QuadraticFunding
             return new Int64Value {Value = State.BasicVotingUnit.Value};
         }
 
+        /// <summary>
+        /// Upper limit 2147483647 * 2.
+        /// Must be unique.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         private string CalculateSenderFeatureValue(Address address)
         {
-            // Upper limit 2147483647
-            return Math.Abs(HashHelper.ComputeFrom(address).ToByteArray().ToInt32(true)).ToString();
+            var hash = HashHelper.ComputeFrom(address);
+            var originInteger = hash.ToByteArray().ToInt32(true);
+            var addMaxValue = (long) originInteger + int.MaxValue;
+            return addMaxValue.ToString();
         }
-        
+
         private string CalculateSenderFeatureValue(string projectId)
         {
             var length = projectId.Length;
