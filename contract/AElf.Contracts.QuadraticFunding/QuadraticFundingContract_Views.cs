@@ -180,7 +180,7 @@ namespace AElf.Contracts.QuadraticFunding
         private string CalculateSenderFeatureValue(string projectId)
         {
             var length = projectId.Length;
-            return int.Parse(projectId.Substring(length - 10)).ToString();
+            return long.Parse(projectId.Substring(length - 10)).ToString();
         }
     }
 }

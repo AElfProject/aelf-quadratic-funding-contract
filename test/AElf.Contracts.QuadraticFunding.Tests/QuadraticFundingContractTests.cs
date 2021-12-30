@@ -37,6 +37,15 @@ namespace AElf.Contracts.QuadraticFunding
             const long donateAmount = 10000_00000000;
             var stub = await Initialize();
 
+            var keyPair = SampleAccount.Accounts.First().KeyPair;
+            var tokenStub = GetTokenContractStub(keyPair);
+            await tokenStub.Approve.SendAsync(new ApproveInput
+            {
+                Spender = DAppContractAddress,
+                Symbol = "ELF",
+                Amount = long.MaxValue
+            });
+
             await stub.RoundStart.SendAsync(new Empty());
             await stub.Donate.SendAsync(new Int64Value
             {
@@ -80,6 +89,26 @@ namespace AElf.Contracts.QuadraticFunding
             executionResult.TransactionResult.Error.ShouldContain("not match");
 
             return calculatedProjectId;
+        }
+
+        [Fact]
+        public async Task BatchUploadProjectTest()
+        {
+            const int bid = 1111;
+            var stub = await Initialize();
+            await stub.RoundStart.SendAsync(new Empty());
+            foreach (var account in SampleAccount.Accounts)
+            {
+                var qfStub = GetQuadraticFundingContractStub(account.KeyPair);
+                var calculatedProjectId = (await qfStub.CalculateProjectId.CallAsync(new CalculateProjectIdInput
+                {
+                    Bid = bid
+                })).Value;
+                calculatedProjectId.Length.ShouldBe(14);
+                calculatedProjectId.ShouldStartWith("1111");
+                var executionResult = await qfStub.UploadProject.SendAsync(new Int64Value {Value = long.Parse(calculatedProjectId)});
+                executionResult.TransactionResult.Status.ShouldBe(TransactionResultStatus.Mined);
+            }
         }
 
         [Fact]
