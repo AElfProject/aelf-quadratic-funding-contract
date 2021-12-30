@@ -63,6 +63,7 @@ namespace AElf.Contracts.QuadraticFunding
         public override Empty SetTaxPoint(Int64Value input)
         {
             AssertSenderIsOwner();
+            AssertPositive(input.Value);
             Assert(input.Value <= MaxTaxPoint, $"Exceeded max tax point: {MaxTaxPoint}");
             State.TaxPoint.Value = input.Value;
             Context.Fire(new TaxPointChanged
@@ -75,6 +76,7 @@ namespace AElf.Contracts.QuadraticFunding
         public override Empty SetInterval(Int64Value input)
         {
             AssertSenderIsOwner();
+            AssertPositive(input.Value);
             State.Interval.Value = input.Value;
             Context.Fire(new RoundIntervalChanged
             {
@@ -86,6 +88,7 @@ namespace AElf.Contracts.QuadraticFunding
         public override Empty SetVotingUnit(Int64Value input)
         {
             AssertSenderIsOwner();
+            AssertPositive(input.Value);
             State.BasicVotingUnit.Value = input.Value;
             Context.Fire(new VotingUnitChanged
             {
@@ -107,6 +110,7 @@ namespace AElf.Contracts.QuadraticFunding
 
         public override Empty Withdraw(Empty input)
         {
+            AssertSenderIsOwner();
             var amount = State.Tax.Value;
             State.Tax.Value = 0;
             State.TokenContract.Transfer.Send(new TransferInput
