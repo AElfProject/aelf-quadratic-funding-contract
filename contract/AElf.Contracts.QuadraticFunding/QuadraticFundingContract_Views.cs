@@ -125,7 +125,18 @@ namespace AElf.Contracts.QuadraticFunding
 
         public override Project GetProjectOf(StringValue input)
         {
-            return State.ProjectMap[input.Value];
+            var project = State.ProjectMap[input.Value];
+            if (project == null)
+            {
+                return new Project();
+            }
+
+            if (State.BanMap[input.Value])
+            {
+                project.SupportArea = 0;
+            }
+
+            return project;
         }
 
         public override StringValue CalculateProjectId(CalculateProjectIdInput input)
