@@ -16,7 +16,7 @@ namespace AElf.Contracts.QuadraticFunding
             var endTime = State.EndTimeMap[currentRound];
             if (endTime == null)
             {
-                throw new AssertionException($"Round {Context.CurrentBlockTime} not started.");
+                throw new AssertionException($"Round {currentRound} not started.");
             }
 
             Assert(Context.CurrentBlockTime > endTime && endTime.Seconds > 0, "Too early.");
@@ -63,7 +63,7 @@ namespace AElf.Contracts.QuadraticFunding
         public override Empty SetTaxPoint(Int64Value input)
         {
             AssertSenderIsOwner();
-            AssertPositive(input.Value);
+            Assert(input.Value >= 0, "Input value should be positive.");
             Assert(input.Value <= MaxTaxPoint, $"Exceeded max tax point: {MaxTaxPoint}");
             State.TaxPoint.Value = input.Value;
             Context.Fire(new TaxPointChanged

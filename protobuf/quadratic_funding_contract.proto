@@ -93,6 +93,9 @@ service QuadraticFundingContract {
     rpc CalculateProjectId (CalculateProjectIdInput) returns (google.protobuf.StringValue) {
         option (aelf.is_view) = true;
     }
+    rpc IsProjectBanned (google.protobuf.StringValue) returns (google.protobuf.BoolValue) {
+        option (aelf.is_view) = true;
+    }
 }
 
 message InitializeInput {

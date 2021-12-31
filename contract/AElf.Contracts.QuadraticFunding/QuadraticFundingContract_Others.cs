@@ -95,6 +95,12 @@ namespace AElf.Contracts.QuadraticFunding
                 Symbol = State.VoteSymbol.Value
             });
 
+            Context.Fire(new Voted
+            {
+                Account = Context.Sender,
+                Project = input.ProjectId,
+                Vote = input.Votes
+            });
             return new Empty();
         }
 

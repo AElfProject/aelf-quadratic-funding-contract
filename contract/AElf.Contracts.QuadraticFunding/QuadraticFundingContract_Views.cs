@@ -163,6 +163,14 @@ namespace AElf.Contracts.QuadraticFunding
             return new Int64Value {Value = State.BasicVotingUnit.Value};
         }
 
+        public override BoolValue IsProjectBanned(StringValue input)
+        {
+            return new BoolValue
+            {
+                Value = State.BanMap[input.Value]
+            };
+        }
+
         /// <summary>
         /// Upper limit 2147483647 * 2.
         /// Must be unique.
