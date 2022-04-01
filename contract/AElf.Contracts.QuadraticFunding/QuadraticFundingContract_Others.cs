@@ -24,6 +24,12 @@ namespace AElf.Contracts.QuadraticFunding
                 Amount = input.Value,
                 Symbol = State.VoteSymbol.Value
             });
+            
+            Context.Fire(new SupportUpdated
+            {
+                Round = currentRound,
+                Support = support
+            });
             return new Empty();
         }
 

@@ -221,3 +221,9 @@ message ProjectUploaded {
     string project_id = 2;
     int64 round = 3;
 }
+
+message SupportUpdated {
+    option (aelf.is_event) = true;
+    int64 support = 1;
+    int64 round = 2;
+}
