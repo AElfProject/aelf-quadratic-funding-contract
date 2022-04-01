@@ -55,7 +55,8 @@ namespace AElf.Contracts.QuadraticFunding
             Context.Fire(new ProjectBanned
             {
                 Project = input.ProjectId,
-                Ban = input.Ban
+                Ban = input.Ban,
+                Round = currentRound
             });
             return new Empty();
         }

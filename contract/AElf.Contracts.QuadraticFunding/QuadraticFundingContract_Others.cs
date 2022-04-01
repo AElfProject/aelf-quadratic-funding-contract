@@ -99,7 +99,10 @@ namespace AElf.Contracts.QuadraticFunding
             {
                 Account = Context.Sender,
                 Project = input.ProjectId,
-                Vote = input.Votes
+                Vote = input.Votes,
+                Round = currentRound,
+                Grants = grants,
+                SupportArea = supportArea
             });
             return new Empty();
         }
