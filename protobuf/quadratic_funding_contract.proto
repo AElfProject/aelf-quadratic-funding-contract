@@ -187,6 +187,7 @@ message ProjectBanned {
     option (aelf.is_event) = true;
     string project = 1;
     bool ban = 2;
+    int64 round = 3;
 }
 
 message TaxPointChanged {
