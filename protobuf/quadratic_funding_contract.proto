@@ -227,3 +227,8 @@ message SupportUpdated {
     int64 support = 1;
     int64 round = 2;
 }
+
+message RoundStarted {
+    option (aelf.is_event) = true;
+    int64 round = 1;
+}

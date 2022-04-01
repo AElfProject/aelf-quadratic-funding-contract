@@ -106,6 +106,10 @@ namespace AElf.Contracts.QuadraticFunding
             State.VotingUnitMap[currentRound] = State.BasicVotingUnit.Value;
             State.StartTimeMap[currentRound] = Context.CurrentBlockTime;
             State.EndTimeMap[currentRound] = Context.CurrentBlockTime.AddSeconds(State.Interval.Value);
+            Context.Fire(new RoundStarted
+            {
+                Round = currentRound
+            });
             return new Empty();
         }
 
