@@ -108,7 +108,8 @@ namespace AElf.Contracts.QuadraticFunding
                 Vote = input.Votes,
                 Round = currentRound,
                 Grants = grants,
-                SupportArea = supportArea
+                SupportArea = supportArea,
+                Cost = cost
             });
             return new Empty();
         }

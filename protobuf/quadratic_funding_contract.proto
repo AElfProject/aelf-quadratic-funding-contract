@@ -213,6 +213,7 @@ message Voted {
     int64 round = 4;
     int64 grants = 5;
     int64 support_area = 6;
+    int64 cost = 7;
 }
 
 message ProjectUploaded {
