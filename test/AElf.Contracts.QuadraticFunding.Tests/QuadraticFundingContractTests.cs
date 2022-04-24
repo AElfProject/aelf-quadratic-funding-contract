@@ -72,7 +72,17 @@ namespace AElf.Contracts.QuadraticFunding
             })).Value;
             calculatedProjectId.Length.ShouldBe(14);
             calculatedProjectId.ShouldStartWith("1111");
-            await stub.UploadProject.SendAsync(new Int64Value {Value = long.Parse(calculatedProjectId)});
+            {
+                var executionResult = await stub.UploadProject.SendAsync(new UploadProjectInput
+                {
+                    Address = SampleAccount.Accounts.First().Address,
+                    Bid = bid
+                });
+                var log = executionResult.TransactionResult.Logs.First();
+                var logEvent = new ProjectUploaded();
+                logEvent.MergeFrom(log);
+                logEvent.ProjectId.ShouldBe(calculatedProjectId);
+            }
 
             var allProjects = await stub.GetAllProjects.CallAsync(new Int64Value
             {
@@ -83,10 +93,15 @@ namespace AElf.Contracts.QuadraticFunding
             // Another account cannot use the same project id.
             var anotherKeyPair = SampleAccount.Accounts.Skip(1).First().KeyPair;
             var anotherStub = GetQuadraticFundingContractStub(anotherKeyPair);
-            var executionResult =
-                await anotherStub.UploadProject.SendWithExceptionAsync(new Int64Value
-                    {Value = long.Parse(calculatedProjectId)});
-            executionResult.TransactionResult.Error.ShouldContain("not match");
+            {
+                var executionResult =
+                    await anotherStub.UploadProject.SendWithExceptionAsync(new UploadProjectInput
+                    {
+                        Address = SampleAccount.Accounts.First().Address,
+                        Bid = bid
+                    });
+                executionResult.TransactionResult.Error.ShouldContain("already created.");
+            }
 
             return calculatedProjectId;
         }
@@ -106,7 +121,11 @@ namespace AElf.Contracts.QuadraticFunding
                 })).Value;
                 calculatedProjectId.Length.ShouldBe(14);
                 calculatedProjectId.ShouldStartWith("1111");
-                var executionResult = await qfStub.UploadProject.SendAsync(new Int64Value {Value = long.Parse(calculatedProjectId)});
+                var executionResult = await qfStub.UploadProject.SendAsync(new UploadProjectInput
+                {
+                    Address = account.Address,
+                    Bid = bid
+                });
                 executionResult.TransactionResult.Status.ShouldBe(TransactionResultStatus.Mined);
             }
         }
@@ -216,6 +235,14 @@ namespace AElf.Contracts.QuadraticFunding
             var originInteger = hash.ToByteArray().ToInt32(true);
             var addMaxValue = (long) originInteger + int.MaxValue;
             return addMaxValue.ToString();
+        }
+
+        [Fact]
+        public void TestDecimal()
+        {
+            const string foo = "0.005";
+            decimal.TryParse(foo, out var bar).ShouldBeTrue();
+            bar.ShouldBe(0.005m);
         }
     }
 }
