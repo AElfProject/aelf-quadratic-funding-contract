@@ -128,7 +128,7 @@ namespace AElf.Contracts.QuadraticFunding
             project.Withdrew = project.Withdrew.Add(input.Amount);
             State.TokenContract.Transfer.Send(new TransferInput
             {
-                To = Context.Sender,
+                To = receiver,
                 Amount = input.Amount,
                 Symbol = State.VoteSymbol.Value
             });
